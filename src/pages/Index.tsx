@@ -8,6 +8,7 @@ import { Loader2, Download, Code2, FileCode, TestTube2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { CodeDisplay } from "@/components/CodeDisplay";
+import JSZip from "jszip";
 
 interface GeneratedFile {
   fileName: string;
@@ -71,31 +72,95 @@ const Index = () => {
     }
   };
 
-  const downloadAll = () => {
+  const downloadAll = async () => {
     if (!framework) return;
 
-    const allFiles = [
-      ...framework.pageObjects,
-      ...framework.testCases,
-      framework.config,
-      framework.jenkinsfile,
-      ...framework.baseClasses,
-      ...framework.utils,
-    ];
+    const zip = new JSZip();
+    
+    // Determine folder structure based on technology
+    const isJava = technology === "java";
+    const isPython = technology === "python";
+    const isJavaScript = technology === "javascript";
+    const isCSharp = technology === "csharp";
 
-    allFiles.forEach((file) => {
-      const blob = new Blob([file.code], { type: "text/plain" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = file.fileName;
-      a.click();
-      URL.revokeObjectURL(url);
-    });
+    if (isJava) {
+      // Maven project structure for Java
+      framework.pageObjects.forEach((file) => {
+        zip.file(`src/main/java/pages/${file.fileName}`, file.code);
+      });
+      framework.testCases.forEach((file) => {
+        zip.file(`src/test/java/tests/${file.fileName}`, file.code);
+      });
+      framework.baseClasses.forEach((file) => {
+        zip.file(`src/main/java/base/${file.fileName}`, file.code);
+      });
+      framework.utils.forEach((file) => {
+        zip.file(`src/main/java/utils/${file.fileName}`, file.code);
+      });
+      zip.file(framework.config.fileName, framework.config.code);
+      zip.file(framework.jenkinsfile.fileName, framework.jenkinsfile.code);
+    } else if (isPython) {
+      // Python project structure
+      framework.pageObjects.forEach((file) => {
+        zip.file(`pages/${file.fileName}`, file.code);
+      });
+      framework.testCases.forEach((file) => {
+        zip.file(`tests/${file.fileName}`, file.code);
+      });
+      framework.baseClasses.forEach((file) => {
+        zip.file(`base/${file.fileName}`, file.code);
+      });
+      framework.utils.forEach((file) => {
+        zip.file(`utils/${file.fileName}`, file.code);
+      });
+      zip.file(framework.config.fileName, framework.config.code);
+      zip.file(framework.jenkinsfile.fileName, framework.jenkinsfile.code);
+    } else if (isJavaScript) {
+      // JavaScript/Node project structure
+      framework.pageObjects.forEach((file) => {
+        zip.file(`src/pages/${file.fileName}`, file.code);
+      });
+      framework.testCases.forEach((file) => {
+        zip.file(`test/${file.fileName}`, file.code);
+      });
+      framework.baseClasses.forEach((file) => {
+        zip.file(`src/base/${file.fileName}`, file.code);
+      });
+      framework.utils.forEach((file) => {
+        zip.file(`src/utils/${file.fileName}`, file.code);
+      });
+      zip.file(framework.config.fileName, framework.config.code);
+      zip.file(framework.jenkinsfile.fileName, framework.jenkinsfile.code);
+    } else if (isCSharp) {
+      // C# project structure
+      framework.pageObjects.forEach((file) => {
+        zip.file(`Pages/${file.fileName}`, file.code);
+      });
+      framework.testCases.forEach((file) => {
+        zip.file(`Tests/${file.fileName}`, file.code);
+      });
+      framework.baseClasses.forEach((file) => {
+        zip.file(`Base/${file.fileName}`, file.code);
+      });
+      framework.utils.forEach((file) => {
+        zip.file(`Utils/${file.fileName}`, file.code);
+      });
+      zip.file(framework.config.fileName, framework.config.code);
+      zip.file(framework.jenkinsfile.fileName, framework.jenkinsfile.code);
+    }
+
+    // Generate and download zip
+    const content = await zip.generateAsync({ type: "blob" });
+    const url = URL.createObjectURL(content);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `selenium-framework-${technology}.zip`;
+    a.click();
+    URL.revokeObjectURL(url);
 
     toast({
-      title: "Download Started",
-      description: `Downloading ${allFiles.length} files`,
+      title: "Framework Downloaded",
+      description: `Complete ${technology} framework with proper folder structure`,
     });
   };
 

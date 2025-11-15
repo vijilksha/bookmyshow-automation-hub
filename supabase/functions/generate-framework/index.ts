@@ -18,54 +18,7 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const systemPrompt = `You are an expert test automation architect. Generate a complete Selenium test automation framework with:
-1. Page Object Model (POM) structure
-2. 25 comprehensive test cases covering critical business processes
-3. Jenkins pipeline configuration
-4. Proper project structure with Maven/Gradle or equivalent
-5. BaseTest class with setup/teardown
-6. Config management
-7. Reporting setup (TestNG/JUnit)
-
-Return the response in JSON format with this exact structure:
-{
-  "framework": {
-    "pageObjects": [
-      {
-        "fileName": "HomePage.${technology === 'java' ? 'java' : 'py'}",
-        "code": "complete code here"
-      }
-    ],
-    "testCases": [
-      {
-        "fileName": "TestExample.${technology === 'java' ? 'java' : 'py'}",
-        "code": "complete code here"
-      }
-    ],
-    "config": {
-      "fileName": "pom.xml or requirements.txt",
-      "code": "complete code here"
-    },
-    "jenkinsfile": {
-      "fileName": "Jenkinsfile",
-      "code": "complete pipeline code here"
-    },
-    "baseClasses": [
-      {
-        "fileName": "BaseTest.${technology === 'java' ? 'java' : 'py'}",
-        "code": "complete code here"
-      }
-    ],
-    "utils": [
-      {
-        "fileName": "ConfigReader.${technology === 'java' ? 'java' : 'py'}",
-        "code": "complete code here"
-      }
-    ]
-  }
-}
-
-Make the code production-ready with proper error handling, waits, and best practices.`;
+    const systemPrompt = `You are an expert test automation architect. Generate a complete Selenium test automation framework with Page Object Model structure, 25 comprehensive test cases, Jenkins pipeline, proper project structure, BaseTest class, config management, and reporting setup. Make the code production-ready with proper error handling, waits, and best practices.`;
 
     const userPrompt = `Generate a complete ${technology} Selenium test automation framework for the website: ${url}
 
@@ -89,6 +42,88 @@ Requirements:
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
+        tools: [
+          {
+            type: "function",
+            function: {
+              name: "generate_framework",
+              description: "Generate a complete test automation framework structure",
+              parameters: {
+                type: "object",
+                properties: {
+                  framework: {
+                    type: "object",
+                    properties: {
+                      pageObjects: {
+                        type: "array",
+                        items: {
+                          type: "object",
+                          properties: {
+                            fileName: { type: "string" },
+                            code: { type: "string" }
+                          },
+                          required: ["fileName", "code"]
+                        }
+                      },
+                      testCases: {
+                        type: "array",
+                        items: {
+                          type: "object",
+                          properties: {
+                            fileName: { type: "string" },
+                            code: { type: "string" }
+                          },
+                          required: ["fileName", "code"]
+                        }
+                      },
+                      config: {
+                        type: "object",
+                        properties: {
+                          fileName: { type: "string" },
+                          code: { type: "string" }
+                        },
+                        required: ["fileName", "code"]
+                      },
+                      jenkinsfile: {
+                        type: "object",
+                        properties: {
+                          fileName: { type: "string" },
+                          code: { type: "string" }
+                        },
+                        required: ["fileName", "code"]
+                      },
+                      baseClasses: {
+                        type: "array",
+                        items: {
+                          type: "object",
+                          properties: {
+                            fileName: { type: "string" },
+                            code: { type: "string" }
+                          },
+                          required: ["fileName", "code"]
+                        }
+                      },
+                      utils: {
+                        type: "array",
+                        items: {
+                          type: "object",
+                          properties: {
+                            fileName: { type: "string" },
+                            code: { type: "string" }
+                          },
+                          required: ["fileName", "code"]
+                        }
+                      }
+                    },
+                    required: ["pageObjects", "testCases", "config", "jenkinsfile", "baseClasses", "utils"]
+                  }
+                },
+                required: ["framework"]
+              }
+            }
+          }
+        ],
+        tool_choice: { type: "function", function: { name: "generate_framework" } }
       }),
     });
 
@@ -114,23 +149,16 @@ Requirements:
     }
 
     const data = await response.json();
-    const content = data.choices?.[0]?.message?.content;
+    const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
 
-    if (!content) {
-      throw new Error("No content received from AI");
+    if (!toolCall || toolCall.function.name !== "generate_framework") {
+      throw new Error("No valid tool call received from AI");
     }
 
-    // Extract JSON from markdown code blocks if present
-    let jsonContent = content;
-    const jsonMatch = content.match(/```json\n([\s\S]*?)\n```/);
-    if (jsonMatch) {
-      jsonContent = jsonMatch[1];
-    }
-
-    const parsedFramework = JSON.parse(jsonContent);
+    const frameworkData = JSON.parse(toolCall.function.arguments);
 
     return new Response(
-      JSON.stringify({ framework: parsedFramework.framework }),
+      JSON.stringify(frameworkData),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {

@@ -82,6 +82,8 @@ const Index = () => {
     const isPython = technology === "python";
     const isJavaScript = technology === "javascript";
     const isCSharp = technology === "csharp";
+    const isPlaywright = technology === "playwright";
+    const isCypress = technology === "cypress";
 
     if (isJava) {
       // Maven project structure for Java
@@ -147,6 +149,38 @@ const Index = () => {
       });
       zip.file(framework.config.fileName, framework.config.code);
       zip.file(framework.jenkinsfile.fileName, framework.jenkinsfile.code);
+    } else if (isPlaywright) {
+      // Playwright TypeScript project structure
+      framework.pageObjects.forEach((file) => {
+        zip.file(`pages/${file.fileName}`, file.code);
+      });
+      framework.testCases.forEach((file) => {
+        zip.file(`tests/${file.fileName}`, file.code);
+      });
+      framework.baseClasses.forEach((file) => {
+        zip.file(`fixtures/${file.fileName}`, file.code);
+      });
+      framework.utils.forEach((file) => {
+        zip.file(`utils/${file.fileName}`, file.code);
+      });
+      zip.file(framework.config.fileName, framework.config.code);
+      zip.file(framework.jenkinsfile.fileName, framework.jenkinsfile.code);
+    } else if (isCypress) {
+      // Cypress project structure
+      framework.pageObjects.forEach((file) => {
+        zip.file(`cypress/pages/${file.fileName}`, file.code);
+      });
+      framework.testCases.forEach((file) => {
+        zip.file(`cypress/e2e/${file.fileName}`, file.code);
+      });
+      framework.baseClasses.forEach((file) => {
+        zip.file(`cypress/support/${file.fileName}`, file.code);
+      });
+      framework.utils.forEach((file) => {
+        zip.file(`cypress/support/utils/${file.fileName}`, file.code);
+      });
+      zip.file(framework.config.fileName, framework.config.code);
+      zip.file(framework.jenkinsfile.fileName, framework.jenkinsfile.code);
     }
 
     // Generate and download zip
@@ -154,7 +188,7 @@ const Index = () => {
     const url = URL.createObjectURL(content);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `selenium-framework-${technology}.zip`;
+    a.download = `test-framework-${technology}.zip`;
     a.click();
     URL.revokeObjectURL(url);
 
@@ -178,7 +212,7 @@ const Index = () => {
             </h1>
           </div>
           <p className="text-muted-foreground text-lg">
-            AI-powered Selenium framework with Page Object Model & Jenkins pipeline
+            AI-powered test automation frameworks with Page Object Model & CI/CD pipeline
           </p>
         </div>
       </header>
@@ -215,6 +249,8 @@ const Index = () => {
                   <SelectItem value="python">Python (Pytest)</SelectItem>
                   <SelectItem value="javascript">JavaScript (WebdriverIO)</SelectItem>
                   <SelectItem value="csharp">C# (NUnit)</SelectItem>
+                  <SelectItem value="playwright">TypeScript (Playwright)</SelectItem>
+                  <SelectItem value="cypress">JavaScript (Cypress)</SelectItem>
                 </SelectContent>
               </Select>
             </div>

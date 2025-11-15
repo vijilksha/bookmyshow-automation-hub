@@ -18,9 +18,10 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const systemPrompt = `You are an expert test automation architect. Generate a complete Selenium test automation framework with Page Object Model structure, 25 comprehensive test cases, Jenkins pipeline, proper project structure, BaseTest class, config management, and reporting setup. Make the code production-ready with proper error handling, waits, and best practices.`;
+    const frameworkType = technology === 'playwright' ? 'Playwright' : technology === 'cypress' ? 'Cypress' : 'Selenium';
+    const systemPrompt = `You are an expert test automation architect. Generate a complete ${frameworkType} test automation framework with Page Object Model structure, 25 comprehensive test cases, Jenkins pipeline, proper project structure, base classes, config management, and reporting setup. Make the code production-ready with proper error handling, waits, and best practices.`;
 
-    const userPrompt = `Generate a complete ${technology} Selenium test automation framework for the website: ${url}
+    const userPrompt = `Generate a complete ${technology} ${frameworkType} test automation framework for the website: ${url}
 
 Requirements:
 - Technology: ${technology}

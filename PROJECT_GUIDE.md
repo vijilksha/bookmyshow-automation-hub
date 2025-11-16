@@ -361,6 +361,23 @@ npx cypress open
 6. **Version Control**: Commit changes regularly
 7. **Continuous Integration**: Set up automated test runs
 
+## Additional Documentation
+
+### Jenkins CI/CD Integration
+
+For detailed Jenkins pipeline setup, Extent Reports configuration, and hands-on scenarios, refer to:
+
+📚 **[JENKINS_HANDS_ON.md](./JENKINS_HANDS_ON.md)** - Complete guide covering:
+- Basic Jenkins pipeline setup
+- Fixing Extent Report integration errors (ClassNotFoundException, report generation issues)
+- Complete Jenkinsfile examples for all supported technologies
+- Parameterized builds
+- Scheduled executions
+- Parallel test execution
+- Email notifications
+- Docker integration
+- Troubleshooting common Jenkins and Extent Report issues
+
 ## License
 
 This generated framework is provided as-is for your testing needs. Customize and use according to your project requirements.

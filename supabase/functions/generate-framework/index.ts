@@ -21,6 +21,18 @@ serve(async (req) => {
     const frameworkType = technology === 'playwright' ? 'Playwright' : technology === 'cypress' ? 'Cypress' : 'Selenium';
     const systemPrompt = `You are an expert test automation architect. Generate a complete ${frameworkType} test automation framework with Page Object Model structure, 25 comprehensive test cases, Jenkins pipeline, proper project structure, base classes, config management, and reporting setup. Make the code production-ready with proper error handling, waits, and best practices.`;
 
+    const reportingInstructions = technology.includes('Selenium') ? `
+CRITICAL - Extent Reports Configuration for Selenium:
+- Add Extent Reports dependency: com.aventstack:extentreports:5.1.1 in pom.xml (Java) or extent-reports in requirements.txt (Python)
+- Create ExtentReportManager utility class with proper initialization
+- In BaseTest class: initialize ExtentSparkReporter with path "target/extent-reports/extent-report.html"
+- Implement @BeforeSuite to setup ExtentReports instance
+- Implement @AfterSuite to flush reports
+- In @BeforeMethod: create ExtentTest instance for each test
+- In @AfterMethod: log test status (pass/fail) with screenshots
+- Ensure report directory is created before writing
+- Include proper error handling for report generation` : '';
+
     const userPrompt = `Generate a complete ${technology} ${frameworkType} test automation framework for the website: ${url}
 
 Requirements:
@@ -29,7 +41,8 @@ Requirements:
 - 25 test cases covering: Login, Search, Booking/Purchase flow, Navigation, Form validation, Error handling, API integration
 - Follow SOLID principles
 - Include proper documentation
-- Setup instructions in comments`;
+- Setup instructions in comments
+${reportingInstructions}`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

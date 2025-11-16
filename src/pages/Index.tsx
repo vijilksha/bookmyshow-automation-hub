@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
-import { Loader2, Download, Code2, FileCode, TestTube2 } from "lucide-react";
+import { Loader2, Download, Code2, FileCode, TestTube2, BookOpen, GraduationCap, Wrench } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { CodeDisplay } from "@/components/CodeDisplay";
@@ -183,6 +183,26 @@ const Index = () => {
       zip.file(framework.jenkinsfile.fileName, framework.jenkinsfile.code);
     }
 
+    // Add documentation files to all downloads
+    try {
+      const docFiles = [
+        { name: 'README.md', path: '/docs/README.md' },
+        { name: 'PROJECT_GUIDE.md', path: '/docs/PROJECT_GUIDE.md' },
+        { name: 'HANDS_ON_TRAINING.md', path: '/docs/HANDS_ON_TRAINING.md' },
+        { name: 'JENKINS_HANDS_ON.md', path: '/docs/JENKINS_HANDS_ON.md' }
+      ];
+
+      for (const doc of docFiles) {
+        const response = await fetch(doc.path);
+        if (response.ok) {
+          const content = await response.text();
+          zip.file(`docs/${doc.name}`, content);
+        }
+      }
+    } catch (error) {
+      console.warn('Could not add documentation files:', error);
+    }
+
     // Generate and download zip
     const content = await zip.generateAsync({ type: "blob" });
     const url = URL.createObjectURL(content);
@@ -194,7 +214,7 @@ const Index = () => {
 
     toast({
       title: "Framework Downloaded",
-      description: `Complete ${technology} framework with proper folder structure`,
+      description: `Complete ${technology} framework with documentation included in docs/ folder`,
     });
   };
 
@@ -218,6 +238,81 @@ const Index = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8 max-w-6xl">
+        {/* Documentation & Training Resources */}
+        <Card className="p-6 mb-8 bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20">
+          <div className="flex items-center gap-2 mb-4">
+            <BookOpen className="w-5 h-5 text-primary" />
+            <h2 className="text-xl font-semibold text-foreground">Documentation & Training</h2>
+          </div>
+          <p className="text-muted-foreground mb-4">
+            Access comprehensive guides and hands-on training materials for freshers and experienced testers
+          </p>
+          <div className="grid md:grid-cols-3 gap-4">
+            <a 
+              href="/docs/HANDS_ON_TRAINING.md" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block"
+            >
+              <Card className="p-4 h-full hover:bg-primary/5 transition-smooth border-border hover:border-primary/50 cursor-pointer group">
+                <div className="flex items-start gap-3">
+                  <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-smooth">
+                    <GraduationCap className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-foreground mb-1">Hands-On Training</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Step-by-step activities for freshers with 7 practical exercises
+                    </p>
+                  </div>
+                </div>
+              </Card>
+            </a>
+            
+            <a 
+              href="/docs/JENKINS_HANDS_ON.md" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block"
+            >
+              <Card className="p-4 h-full hover:bg-primary/5 transition-smooth border-border hover:border-primary/50 cursor-pointer group">
+                <div className="flex items-start gap-3">
+                  <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-smooth">
+                    <Wrench className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-foreground mb-1">Jenkins CI/CD Guide</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Complete Jenkins setup with Extent Reports and troubleshooting
+                    </p>
+                  </div>
+                </div>
+              </Card>
+            </a>
+            
+            <a 
+              href="/docs/PROJECT_GUIDE.md" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block"
+            >
+              <Card className="p-4 h-full hover:bg-primary/5 transition-smooth border-border hover:border-primary/50 cursor-pointer group">
+                <div className="flex items-start gap-3">
+                  <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-smooth">
+                    <BookOpen className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-foreground mb-1">Project Guide</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Overview, features, requirements, and best practices
+                    </p>
+                  </div>
+                </div>
+              </Card>
+            </a>
+          </div>
+        </Card>
+
         {/* Input Form */}
         <Card className="p-6 mb-8 bg-gradient-card border-border/50 shadow-tech">
           <div className="grid md:grid-cols-2 gap-6 mb-6">

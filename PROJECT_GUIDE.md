@@ -363,6 +363,18 @@ npx cypress open
 
 ## Additional Documentation
 
+### Hands-On Training for Freshers
+
+For step-by-step practical training with activities and exercises, refer to:
+
+📚 **[HANDS_ON_TRAINING.md](./HANDS_ON_TRAINING.md)** - Complete training guide covering:
+- 7 hands-on activities from basics to Jenkins setup
+- Step-by-step instructions for beginners
+- Practice exercises and assessments
+- Common mistakes to avoid
+- Troubleshooting guidance
+- Additional learning resources
+
 ### Jenkins CI/CD Integration
 
 For detailed Jenkins pipeline setup, Extent Reports configuration, and hands-on scenarios, refer to:
